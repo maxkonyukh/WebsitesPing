@@ -36,16 +36,14 @@ namespace WebsitesPing
         {
             var amountOfAwaited = 0;
 
-            if (amountOfWebsites > urls.Count())
-            {
-                amountOfWebsites = urls.Count();
-            }
+            var enumeratedUrls = urls.ToList();
+            amountOfWebsites = amountOfWebsites > enumeratedUrls.Count ? enumeratedUrls.Count : amountOfWebsites;
 
             using (var httpClient = new HttpClient())
             {
                 var tasks = new List<Task<HttpResponseMessage>>();
 
-                foreach (var url in urls)
+                foreach (var url in enumeratedUrls)
                 {
                     tasks.Add(httpClient.SendAsync(new HttpRequestMessage
                     {
@@ -56,7 +54,7 @@ namespace WebsitesPing
 
                 foreach (var task in tasks.OrderByCompletion())
                 {
-                    HttpResponseMessage response = await task;
+                    var response = await task;
                     if (response.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"Host: {response.RequestMessage.RequestUri}");
